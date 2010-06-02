@@ -76,6 +76,10 @@ class SCAN(Disk_scheduler):
 
 
 def main():
+    if len(sys.argv) == 1:
+        print "Uso: ./disk.py <fcfs | sstf | scan | cscan> <offset> <tamanho> <acessos ..>"
+        exit(0)
+
     sys.argv.pop(0)
 
     choice = sys.argv.pop(0)

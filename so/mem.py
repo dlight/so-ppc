@@ -83,6 +83,10 @@ class Worst_fit(Memory_scheduler):
         else:
             raise Exception("Sem memoria")
 
+if len(sys.argv) == 1:
+        print "Uso: ./mem.py <first | best | worst> <blocos livres ..> -- <blocos a alocar..>"
+	exit(0)
+
 free = []
 alloc = []
 
@@ -98,6 +102,7 @@ elif choice == 'worst':
     algorithm = Worst_fit
 
 em = free
+
 
 for i in sys.argv:
     if i == "--":
