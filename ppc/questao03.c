@@ -32,7 +32,7 @@ void fork_me(GtkWidget *widget, gpointer data)
 	pid_t pid = fork();
 
 	if(pid == 0) {
-		execlp("./test", "./test", NULL);
+		execlp("./questao03", "./questao03", NULL);
 		_exit(-1);
 	}
 	else {
