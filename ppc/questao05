@@ -1,0 +1,118 @@
+#!/usr/bin/env python
+
+import pygtk
+pygtk.require('2.0')
+import gtk,os
+
+def is_number(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
+def get_procs():
+    a = []
+    for i in os.listdir('/proc'):
+        if is_number(i): a.append(i)
+    return a
+
+def risos():
+    try:
+        a = []
+        for i in os.listdir('/proc'):
+            if is_number(i): a.append(str.split(open('/proc/%s/stat' % i, 'r').readline()))
+
+        return a
+
+    except IOError:
+        #print 'hmmm'
+        return risos()
+
+def get_proc(l):
+
+    pid = int(l[0])
+    name = l[1][1:-1]
+    if l[2] == 'R':
+        status = 'Executando'
+    elif l[2] == 'Z':
+        status = 'Zumbi'
+    elif l[2] == 'S':
+        status = 'Dormindo'
+    elif l[2] == 'D':
+        status = 'Esperando'
+    elif l[2] == 'T':
+        status = 'Parado'
+    else:
+        status = '?'
+    return [pid, status, name]
+
+
+def get_list():
+    return [get_proc(i) for i in get_procs()]
+    
+
+
+class Ps:
+    def update(self, widget = None, data = None):
+        self.liststore.clear()
+        for i in risos():
+            #print i
+            self.liststore.append(get_proc(i))
+
+
+    def __init__(self):
+        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+
+        self.window.set_size_request(350, 450)
+
+        self.window.connect("delete_event", gtk.main_quit)
+
+        self.treeview = gtk.TreeView()
+
+        self.treeview.columns = [None]*3
+        self.treeview.columns[0] = gtk.TreeViewColumn('PID')
+        self.treeview.columns[1] = gtk.TreeViewColumn('Status')
+        self.treeview.columns[2] = gtk.TreeViewColumn('Nome')
+
+        self.treeview.set_search_column(3)
+
+        self.liststore = gtk.ListStore(int, str, str)
+
+        self.update()
+
+        self.treeview.set_model(self.liststore)
+
+        for n in range(3):
+            self.treeview.append_column(self.treeview.columns[n])
+
+            self.treeview.columns[n].cell = gtk.CellRendererText()
+
+            self.treeview.columns[n].pack_start(self.treeview.columns[n].cell,
+                                                True)
+
+            self.treeview.columns[n].set_attributes(
+                self.treeview.columns[n].cell, text=n)
+
+
+        self.scrolledwindow = gtk.ScrolledWindow()
+
+        self.button = gtk.Button(label = 'Atualizar')
+
+        self.button.connect("clicked", self.update, 'hm')
+
+        self.a = gtk.Alignment()
+
+        self.a.add(self.button)
+
+        self.vbox = gtk.VBox()
+        self.vbox.pack_start(self.a, False)
+        self.vbox.pack_start(self.scrolledwindow)
+
+        self.scrolledwindow.add(self.treeview)
+        self.window.add(self.vbox)
+
+        self.window.show_all()
+        gtk.main()
+
+a = Ps()

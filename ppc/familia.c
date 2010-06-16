@@ -76,6 +76,8 @@ void sou_pai()
 	familia[2].nome = "Huguinho";
 	familia[3].nome = "Luizinho";
 
+	familia[0].nascimento = 0;
+
 	familia[0].vivo = 1;
 	familia[1].vivo =
 	familia[2].vivo =
